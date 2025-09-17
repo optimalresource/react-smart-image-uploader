@@ -1,0 +1,70 @@
+{
+  "name": "react-smart-image-uploader",
+  "version": "1.0.0",
+  "description": "A powerful and customizable image uploader component for React with cropping, compression, and session persistence features",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "image",
+    "upload",
+    "uploader",
+    "crop",
+    "compression",
+    "base64",
+    "typescript",
+    "component",
+    "ui"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/react-smart-image-uploader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/react-smart-image-uploader/issues"
+  },
+  "homepage": "https://github.com/yourusername/react-smart-image-uploader#readme",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "compressorjs": "^1.2.1",
+    "react-image-crop": "^11.0.5"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "jest": "^29.0.0",
+    "rollup": "^3.0.0",
+    "rollup-plugin-dts": "^6.0.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.0.0"
+  }
+}

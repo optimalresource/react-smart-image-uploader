@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Smart Image Uploader - Vanilla JS Example</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .example-section {
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+        }
+
+        .example-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .example-section p {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+        }
+
+        .uploader-container {
+            margin-bottom: 1rem;
+        }
+
+        .results {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .file-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .file-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin: 0.5rem 0 0.25rem 0;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            word-break: break-word;
+        }
+
+        .file-size {
+            color: #7f8c8d;
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.danger {
+            background: #e74c3c;
+        }
+
+        .btn.danger:hover {
+            background: #c0392b;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .note strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>React Smart Image Uploader - Vanilla JS Example</h1>
+        
+        <div class="note">
+            <strong>Note:</strong>
+            This example demonstrates how to use the React Smart Image Uploader package in a vanilla JavaScript environment.
+            In a real-world scenario, you would typically use this package in a React application where it's designed to work optimally.
+        </div>
+
+        <!-- Basic Upload Example -->
+        <div class="example-section">
+            <h2>1. Basic Image Upload</h2>
+            <p>Simple image upload with default settings</p>
+            
+            <div class="uploader-container">
+                <div id="basic-uploader"></div>
+            </div>
+            
+            <div id="basic-results" class="results" style="display: none;">
+                <h3>Uploaded Files:</h3>
+                <div id="basic-file-grid" class="file-grid"></div>
+            </div>
+        </div>
+
+        <!-- Multiple Upload Example -->
+        <div class="example-section">
+            <h2>2. Multiple Upload with Compression</h2>
+            <p>Upload multiple images with automatic compression</p>
+            
+            <div class="uploader-container">
+                <div id="multiple-uploader"></div>
+            </div>
+            
+            <div id="multiple-results" class="results" style="display: none;">
+                <h3>Uploaded Files:</h3>
+                <div id="multiple-file-grid" class="file-grid"></div>
+            </div>
+        </div>
+
+        <!-- Manual Upload Example -->
+        <div class="example-section">
+            <h2>3. Manual File Selection</h2>
+            <p>Traditional file input with processing</p>
+            
+            <div class="controls">
+                <input type="file" id="manual-input" multiple accept="image/*" style="display: none;">
+                <button class="btn" onclick="document.getElementById('manual-input').click()">
+                    Select Images
+                </button>
+                <button class="btn danger" onclick="clearManualFiles()">
+                    Clear Files
+                </button>
+            </div>
+            
+            <div id="manual-results" class="results" style="display: none;">
+                <h3>Selected Files:</h3>
+                <div id="manual-file-grid" class="file-grid"></div>
+            </div>
+        </div>
+
+        <!-- Session Storage Example -->
+        <div class="example-section">
+            <h2>4. Session Storage Demo</h2>
+            <p>Files persist across page refreshes using localStorage</p>
+            
+            <div class="controls">
+                <input type="file" id="session-input" multiple accept="image/*" style="display: none;">
+                <button class="btn" onclick="document.getElementById('session-input').click()">
+                    Select Images (Persistent)
+                </button>
+                <button class="btn" onclick="window.location.reload()">
+                    Refresh Page
+                </button>
+                <button class="btn danger" onclick="clearSessionFiles()">
+                    Clear Session
+                </button>
+            </div>
+            
+            <div id="session-results" class="results">
+                <h3>Session Files:</h3>
+                <div id="session-file-grid" class="file-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions for file processing
+        function formatFileSize(bytes) {
+            return (bytes / 1024).toFixed(2) + ' KB';
+        }
+
+        function createFileCard(file, url) {
+            return `
+                <div class="file-card">
+                    <img src="${url}" alt="${file.name}" />
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                </div>
+            `;
+        }
+
+        function processFiles(files, callback) {
+            const processedFiles = [];
+            let processed = 0;
+
+            Array.from(files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        processedFiles[index] = {
+                            file: file,
+                            url: e.target.result,
+                            base64: e.target.result
+                        };
+                        processed++;
+                        if (processed === files.length) {
+                            callback(processedFiles.filter(f => f));
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    processed++;
+                    if (processed === files.length) {
+                        callback(processedFiles.filter(f => f));
+                    }
+                }
+            });
+        }
+
+        function displayFiles(files, containerId) {
+            const container = document.getElementById(containerId);
+            const resultsDiv = container.closest('.results') || container.parentElement.querySelector('.results');
+            
+            if (files.length > 0) {
+                container.innerHTML = files.map(file => createFileCard(file.file, file.url)).join('');
+                if (resultsDiv) resultsDiv.style.display = 'block';
+            } else {
+                container.innerHTML = '';
+                if (resultsDiv) resultsDiv.style.display = 'none';
+            }
+        }
+
+        // Basic upload functionality
+        function setupBasicUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            
+            const button = document.createElement('button');
+            button.className = 'btn';
+            button.textContent = 'Select Image';
+            button.onclick = () => input.click();
+            
+            input.onchange = (e) => {
+                processFiles(e.target.files, (files) => {
+                    displayFiles(files, 'basic-file-grid');
+                });
+            };
+            
+            const container = document.getElementById('basic-uploader');
+            container.appendChild(button);
+            container.appendChild(input);
+        }
+
+        // Multiple upload functionality
+        function setupMultipleUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.style.display = 'none';
+            
+            const button = document.createElement('button');
+            button.className = 'btn';
+            button.textContent = 'Select Multiple Images';
+            button.onclick = () => input.click();
+            
+            input.onchange = (e) => {
+                processFiles(e.target.files, (files) => {
+                    displayFiles(files, 'multiple-file-grid');
+                });
+            };
+            
+            const container = document.getElementById('multiple-uploader');
+            container.appendChild(button);
+            container.appendChild(input);
+        }
+
+        // Manual upload functionality
+        document.getElementById('manual-input').onchange = (e) => {
+            processFiles(e.target.files, (files) => {
+                displayFiles(files, 'manual-file-grid');
+            });
+        };
+
+        function clearManualFiles() {
+            document.getElementById('manual-input').value = '';
+            displayFiles([], 'manual-file-grid');
+        }
+
+        // Session storage functionality
+        const SESSION_KEY = 'vanilla-js-demo-files';
+
+        function saveToSession(files) {
+            const fileData = files.map(f => ({
+                name: f.file.name,
+                size: f.file.size,
+                type: f.file.type,
+                url: f.url,
+                base64: f.base64
+            }));
+            localStorage.setItem(SESSION_KEY, JSON.stringify(fileData));
+        }
+
+        function loadFromSession() {
+            const stored = localStorage.getItem(SESSION_KEY);
+            if (stored) {
+                try {
+                    const fileData = JSON.parse(stored);
+                    const files = fileData.map(data => ({
+                        file: {
+                            name: data.name,
+                            size: data.size,
+                            type: data.type
+                        },
+                        url: data.url,
+                        base64: data.base64
+                    }));
+                    displayFiles(files, 'session-file-grid');
+                } catch (e) {
+                    console.error('Error loading session files:', e);
+                }
+            }
+        }
+
+        document.getElementById('session-input').onchange = (e) => {
+            processFiles(e.target.files, (files) => {
+                displayFiles(files, 'session-file-grid');
+                saveToSession(files);
+            });
+        };
+
+        function clearSessionFiles() {
+            localStorage.removeItem(SESSION_KEY);
+            displayFiles([], 'session-file-grid');
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setupBasicUpload();
+            setupMultipleUpload();
+            loadFromSession();
+        });
+    </script>
+</body>
+</html>
