@@ -70,7 +70,7 @@ function App() {
 | `maxFiles` | `number` | `10` | Maximum number of files |
 | `maxSize` | `number` | `5242880` | Maximum file size in bytes (5MB) |
 | `disabled` | `boolean` | `false` | Disable the uploader |
-| `compression` | `CompressionConfig` | See below | Image compression settings |
+| `compression` | `CompressionConfig \| null` | `{ quality: 0.2, maxWidth: 1920, maxHeight: 1080 }` | Image compression settings (pass `null` to disable) |
 | `crop` | `CropConfig` | `undefined` | Image cropping settings |
 | `session` | `SessionConfig` | `undefined` | Session persistence settings |
 | `customUI` | `(props: CustomUIProps) => ReactNode` | `undefined` | Custom UI renderer |
@@ -154,6 +154,23 @@ function MultipleUpload() {
           console.log('Base64:', file.base64);
           console.log('Blob:', file.blob);
         });
+      }}
+    />
+  );
+}
+```
+
+### Disable Compression
+
+```tsx
+function NoCompressionUpload() {
+  return (
+    <ImageUploader
+      multiple
+      compression={null} // Disable compression entirely
+      onFilesChange={(files) => {
+        // Files will be uploaded without compression
+        console.log('Original files:', files);
       }}
     />
   );

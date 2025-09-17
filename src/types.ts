@@ -51,7 +51,7 @@ export interface ImageUploaderProps {
   disabled?: boolean;
 
   // Compression settings
-  compression?: CompressionConfig;
+  compression?: CompressionConfig | null;
 
   // Cropping settings
   crop?: CropConfig;

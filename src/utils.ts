@@ -44,14 +44,22 @@ export const compressImage = (
 
 export const processFile = async (
   file: File,
-  compression?: CompressionConfig
+  compression?: CompressionConfig | null
 ): Promise<ProcessedImage> => {
   let processedFile = file;
   
-  // Compress if it's an image and compression is enabled
-  if (file.type.startsWith('image/') && compression) {
+  // Apply default compression if not explicitly disabled (null)
+  const defaultCompression: CompressionConfig = {
+    quality: 0.2,
+    maxWidth: 1920,
+    maxHeight: 1080,
+  };
+  
+  // Compress if it's an image and compression is not explicitly disabled
+  if (file.type.startsWith('image/') && compression !== null) {
+    const compressionConfig = compression || defaultCompression;
     try {
-      processedFile = await compressImage(file, compression);
+      processedFile = await compressImage(file, compressionConfig);
     } catch (error) {
       console.warn('Image compression failed, using original file:', error);
     }

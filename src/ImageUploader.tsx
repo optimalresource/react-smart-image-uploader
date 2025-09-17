@@ -33,7 +33,7 @@ const ImageUploader = forwardRef<ImageUploaderRef, ImageUploaderProps>(
       maxSize = 5 * 1024 * 1024, // 5MB default
       disabled = false,
       compression = {
-        quality: 0.8,
+        quality: 0.2,
         maxWidth: 1920,
         maxHeight: 1080,
       },
