@@ -1,6 +1,6 @@
 {
   "name": "react-smart-image-uploader",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A powerful and customizable image uploader component for React with cropping, compression, and session persistence features",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -34,12 +34,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/react-smart-image-uploader.git"
+    "url": "https://github.com/optimalresource/react-smart-image-uploader.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/react-smart-image-uploader/issues"
+    "url": "https://github.com/optimalresource/react-smart-image-uploader/issues"
   },
-  "homepage": "https://github.com/yourusername/react-smart-image-uploader#readme",
+  "homepage": "https://github.com/optimalresource/react-smart-image-uploader#readme",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
