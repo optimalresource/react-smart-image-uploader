@@ -3,6 +3,7 @@ export interface ImageFile {
   size: number;
   type: string;
   lastModified: number;
+  fileCategory: 'image' | 'pdf' | 'excel' | 'word' | 'other';
 }
 
 export interface ProcessedImage {

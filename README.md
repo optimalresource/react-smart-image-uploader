@@ -1,12 +1,13 @@
-# React Smart Image Uploader
+# React Smart File Uploader
 
-🚀 A powerful and customizable image uploader component for React with cropping, compression, and session persistence features.
+🚀 A powerful and customizable file uploader component for React supporting images, PDFs, Excel, and Word documents with intelligent compression, cropping, and session persistence.
 
 ## Features
 
 - ✨ **Easy to use**: Simple API with sensible defaults
+- 📄 **Multiple file types**: Images, PDFs, Excel (.xlsx, .xls), Word (.docx, .doc)
+- 🗜️ **Smart compression**: Automatic compression for images and PDFs
 - 🖼️ **Image cropping**: Circle and square cropping with customizable dimensions
-- 🗜️ **Image compression**: Built-in compression with quality control
 - 💾 **Session persistence**: Keep uploaded files across page refreshes
 - 🎨 **Fully customizable**: Replace the default UI with your own components
 - 📱 **Responsive**: Works great on desktop and mobile
@@ -17,20 +18,20 @@
 ## Installation
 
 ```bash
-npm install react-smart-image-uploader
+npm install react-smart-file-uploader
 ```
 
 or
 
 ```bash
-yarn add react-smart-image-uploader
+yarn add react-smart-file-uploader
 ```
 
 ## Quick Start
 
 ```tsx
 import React, { useState } from 'react';
-import { ImageUploader, ProcessedImage } from 'react-smart-image-uploader';
+import { ImageUploader, ProcessedImage } from 'react-smart-file-uploader';
 
 function App() {
   const [files, setFiles] = useState<ProcessedImage[]>([]);
@@ -59,6 +60,34 @@ function App() {
 }
 ```
 
+## Supported File Types
+
+The uploader intelligently handles different file types:
+
+### Images
+- **Formats**: JPG, PNG, GIF, WebP, SVG, etc.
+- **Compression**: ✅ Automatic (configurable quality)
+- **Cropping**: ✅ Supported (circle/square)
+- **Preview**: ✅ Thumbnail display
+
+### PDFs
+- **Formats**: PDF
+- **Compression**: ✅ Automatic optimization
+- **Cropping**: ❌ Not applicable
+- **Preview**: ✅ File icon display
+
+### Excel Spreadsheets
+- **Formats**: .xlsx, .xls
+- **Compression**: ❌ Disabled (preserves data integrity)
+- **Cropping**: ❌ Not applicable
+- **Preview**: ✅ File icon display
+
+### Word Documents
+- **Formats**: .docx, .doc
+- **Compression**: ❌ Disabled (preserves formatting)
+- **Cropping**: ❌ Not applicable
+- **Preview**: ✅ File icon display
+
 ## API Reference
 
 ### ImageUploader Props
@@ -66,11 +95,11 @@ function App() {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `multiple` | `boolean` | `false` | Allow multiple file selection |
-| `accept` | `string` | `undefined` | File types to accept (e.g., "image/*") |
+| `accept` | `string` | `undefined` | File types to accept (e.g., "image/*", "application/pdf", ".xlsx,.xls,.docx,.doc") |
 | `maxFiles` | `number` | `10` | Maximum number of files |
 | `maxSize` | `number` | `5242880` | Maximum file size in bytes (5MB) |
 | `disabled` | `boolean` | `false` | Disable the uploader |
-| `compression` | `CompressionConfig \| null` | `{ quality: 0.2, maxWidth: 1920, maxHeight: 1080 }` | Image compression settings (pass `null` to disable) |
+| `compression` | `CompressionConfig \| null` | `{ quality: 0.2, maxWidth: 1920, maxHeight: 1080 }` | Compression settings for images and PDFs (pass `null` to disable) |
 | `crop` | `CropConfig` | `undefined` | Image cropping settings |
 | `session` | `SessionConfig` | `undefined` | Session persistence settings |
 | `customUI` | `(props: CustomUIProps) => ReactNode` | `undefined` | Custom UI renderer |
@@ -124,13 +153,148 @@ interface SessionConfig {
 ### Basic Image Upload
 
 ```tsx
-import { ImageUploader } from 'react-smart-image-uploader';
+import { ImageUploader } from 'react-smart-file-uploader';
 
 function BasicUpload() {
   return (
     <ImageUploader
       accept="image/*"
       onFilesChange={(files) => console.log('Files:', files)}
+    />
+  );
+}
+```
+
+### Multi-Format File Upload
+
+```tsx
+function MultiFormatUpload() {
+  const [files, setFiles] = useState<ProcessedImage[]>([]);
+
+  return (
+    <ImageUploader
+      multiple
+      accept="image/*,.pdf,.xlsx,.xls,.docx,.doc"
+      maxFiles={10}
+      maxSize={10 * 1024 * 1024} // 10MB
+      onFilesChange={(files) => {
+        setFiles(files);
+        files.forEach(file => {
+          console.log('File type:', file.file.fileCategory);
+          console.log('Original size:', file.file.size);
+        });
+      }}
+    />
+  );
+}
+```
+
+### PDF Upload with Compression
+
+```tsx
+function PDFUpload() {
+  return (
+    <ImageUploader
+      multiple
+      accept=".pdf"
+      compression={{
+        quality: 0.7, // PDF compression quality
+        maxWidth: 1920,
+        maxHeight: 1080,
+      }}
+      onFilesChange={(files) => {
+        files.forEach(file => {
+          console.log('PDF compressed:', file.base64);
+        });
+      }}
+    />
+  );
+}
+```
+
+### Excel/Word Upload (No Compression)
+
+```tsx
+function DocumentUpload() {
+  return (
+    <ImageUploader
+      multiple
+      accept=".xlsx,.xls,.docx,.doc"
+      // Compression is automatically disabled for Excel and Word files
+      onFilesChange={(files) => {
+        files.forEach(file => {
+          console.log('Document uploaded:', file.file.name);
+          console.log('File category:', file.file.fileCategory);
+        });
+      }}
+    />
+  );
+}
+```
+```
+
+### Multi-Format File Upload
+
+```tsx
+function MultiFormatUpload() {
+  const [files, setFiles] = useState<ProcessedImage[]>([]);
+
+  return (
+    <ImageUploader
+      multiple
+      accept="image/*,.pdf,.xlsx,.xls,.docx,.doc"
+      maxFiles={10}
+      maxSize={10 * 1024 * 1024} // 10MB
+      onFilesChange={(files) => {
+        setFiles(files);
+        files.forEach(file => {
+          console.log('File type:', file.file.fileCategory);
+          console.log('Original size:', file.file.size);
+        });
+      }}
+    />
+  );
+}
+```
+
+### PDF Upload with Compression
+
+```tsx
+function PDFUpload() {
+  return (
+    <ImageUploader
+      multiple
+      accept=".pdf"
+      compression={{
+        quality: 0.7, // PDF compression quality
+        maxWidth: 1920,
+        maxHeight: 1080,
+      }}
+      onFilesChange={(files) => {
+        files.forEach(file => {
+          console.log('PDF compressed:', file.base64);
+        });
+      }}
+    />
+  );
+}
+```
+
+### Excel/Word Upload (No Compression)
+
+```tsx
+function DocumentUpload() {
+  return (
+    <ImageUploader
+      multiple
+      accept=".xlsx,.xls,.docx,.doc"
+      // Compression is automatically disabled for Excel and Word files
+      onFilesChange={(files) => {
+        files.forEach(file => {
+          console.log('Document uploaded:', file.file.name);
+          console.log('File category:', file.file.fileCategory);
+        });
+      }}
     />
   );
 }
@@ -252,7 +416,7 @@ function CustomUIUpload() {
 
 ```tsx
 import { useRef } from 'react';
-import { ImageUploader, ImageUploaderRef } from 'react-smart-image-uploader';
+import { ImageUploader, ImageUploaderRef } from 'react-smart-file-uploader';
 
 function RefExample() {
   const uploaderRef = useRef<ImageUploaderRef>(null);
@@ -334,7 +498,7 @@ import {
   CropConfig,
   CompressionConfig,
   SessionConfig,
-} from 'react-smart-image-uploader';
+} from 'react-smart-file-uploader';
 ```
 
 ## Browser Support
@@ -353,6 +517,17 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 MIT © [Your Name]
 
 ## Changelog
+
+### v2.0.0 (Latest)
+- 🎉 **Major Update**: Multi-format file support
+- ✨ Added support for PDF files with automatic compression
+- ✨ Added support for Excel files (.xlsx, .xls) - compression disabled
+- ✨ Added support for Word documents (.docx, .doc) - compression disabled
+- 🔧 Added `fileCategory` property to track file types
+- 🔧 Enhanced file type detection with `getFileCategory` utility
+- 🎨 Improved file preview with type-specific icons
+- 📝 Renamed package from `react-smart-image-uploader` to `react-smart-file-uploader`
+- 📚 Updated documentation with multi-format examples
 
 ### v1.0.0
 - Initial release

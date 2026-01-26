@@ -35,8 +35,23 @@ const DefaultUI: React.FC<DefaultUIProps> = ({
     return baseStyles;
   };
 
+  const getFileIcon = (fileCategory: string) => {
+    switch (fileCategory) {
+      case 'image':
+        return '🖼️';
+      case 'pdf':
+        return '📄';
+      case 'excel':
+        return '📊';
+      case 'word':
+        return '📝';
+      default:
+        return '📎';
+    }
+  };
+
   const renderPreview = (image: ProcessedImage, index: number) => {
-    const isImage = image.file.type.startsWith('image/');
+    const isImage = image.file.fileCategory === 'image';
     
     return (
       <div key={index} className="relative group">
@@ -57,9 +72,9 @@ const DefaultUI: React.FC<DefaultUIProps> = ({
           </div>
         ) : (
           <div className="w-24 h-24 bg-gray-100 rounded-lg border flex flex-col items-center justify-center relative">
-            <div className="text-2xl mb-1">📄</div>
+            <div className="text-2xl mb-1">{getFileIcon(image.file.fileCategory)}</div>
             <div className="text-xs text-gray-600 text-center px-1 truncate w-full">
-              {image.file.name}
+              {image.file.name.split('.').pop()?.toUpperCase()}
             </div>
             <button
               onClick={() => removeFile(index)}
@@ -138,7 +153,7 @@ const DefaultUI: React.FC<DefaultUIProps> = ({
       )}
 
       {/* File List (Alternative view for non-image files) */}
-      {showPreview && files.length > 0 && files.some(f => !f.file.type.startsWith('image/')) && (
+      {showPreview && files.length > 0 && files.some(f => f.file.fileCategory !== 'image') && (
         <div className="mt-4">
           <div className="bg-gray-50 rounded-lg p-4">
             <h5 className="text-sm font-medium text-gray-700 mb-2">File Details</h5>

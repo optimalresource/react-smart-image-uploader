@@ -169,8 +169,8 @@ const ImageUploader = forwardRef<ImageUploaderRef, ImageUploaderProps>(
             onProgress?.(currentProgress);
           }
 
-          // Handle cropping for images
-          if (crop?.enabled && processedFiles.length === 1 && processedFiles[0].file.type.startsWith('image/')) {
+          // Handle cropping for images only
+          if (crop?.enabled && processedFiles.length === 1 && processedFiles[0].file.fileCategory === 'image') {
             setCropImage(processedFiles[0]);
           } else {
             const newFiles = multiple ? [...files, ...processedFiles] : processedFiles;

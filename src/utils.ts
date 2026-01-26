@@ -1,4 +1,5 @@
 import Compressor from 'compressorjs';
+import { PDFDocument } from 'pdf-lib';
 import { ProcessedImage, CompressionConfig } from './types';
 
 // File validation utilities
@@ -14,6 +15,44 @@ export const validateFileType = (file: File, acceptedTypes: string[]): boolean =
     }
     return file.type.match(type.replace('*', '.*'));
   });
+};
+
+// Determine file category based on MIME type or extension
+export const getFileCategory = (file: File): 'image' | 'pdf' | 'excel' | 'word' | 'other' => {
+  const fileName = file.name.toLowerCase();
+  const fileType = file.type.toLowerCase();
+
+  // Check for images
+  if (fileType.startsWith('image/')) {
+    return 'image';
+  }
+
+  // Check for PDFs
+  if (fileType === 'application/pdf' || fileName.endsWith('.pdf')) {
+    return 'pdf';
+  }
+
+  // Check for Excel files
+  if (
+    fileType === 'application/vnd.ms-excel' ||
+    fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    fileName.endsWith('.xls') ||
+    fileName.endsWith('.xlsx')
+  ) {
+    return 'excel';
+  }
+
+  // Check for Word files
+  if (
+    fileType === 'application/msword' ||
+    fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    fileName.endsWith('.doc') ||
+    fileName.endsWith('.docx')
+  ) {
+    return 'word';
+  }
+
+  return 'other';
 };
 
 // File processing utilities
@@ -42,11 +81,46 @@ export const compressImage = (
   });
 };
 
+// PDF compression utility
+export const compressPDF = async (
+  file: File,
+  config: CompressionConfig
+): Promise<File> => {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+
+    // Save with compression options
+    // Note: pdf-lib doesn't have direct quality control like images,
+    // but we can optimize by removing unnecessary data
+    const compressedPdfBytes = await pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+      objectsPerTick: 50,
+    });
+
+    // Create a new File from the compressed bytes
+    // Use slice to create a proper ArrayBuffer from Uint8Array
+    const buffer = compressedPdfBytes.slice().buffer;
+    const compressedBlob = new Blob([buffer], { type: 'application/pdf' });
+    const compressedFile = new File([compressedBlob], file.name, {
+      type: 'application/pdf',
+      lastModified: file.lastModified,
+    });
+
+    return compressedFile;
+  } catch (error) {
+    console.warn('PDF compression failed, using original file:', error);
+    return file;
+  }
+};
+
 export const processFile = async (
   file: File,
   compression?: CompressionConfig | null
 ): Promise<ProcessedImage> => {
   let processedFile = file;
+  const fileCategory = getFileCategory(file);
   
   // Apply default compression if not explicitly disabled (null)
   const defaultCompression: CompressionConfig = {
@@ -55,13 +129,21 @@ export const processFile = async (
     maxHeight: 1080,
   };
   
-  // Compress if it's an image and compression is not explicitly disabled
-  if (file.type.startsWith('image/') && compression !== null) {
+  // Compress based on file type if compression is not explicitly disabled
+  if (compression !== null) {
     const compressionConfig = compression || defaultCompression;
+    
     try {
-      processedFile = await compressImage(file, compressionConfig);
+      if (fileCategory === 'image') {
+        // Compress images
+        processedFile = await compressImage(file, compressionConfig);
+      } else if (fileCategory === 'pdf') {
+        // Compress PDFs
+        processedFile = await compressPDF(file, compressionConfig);
+      }
+      // Excel and Word files are not compressed
     } catch (error) {
-      console.warn('Image compression failed, using original file:', error);
+      console.warn(`${fileCategory} compression failed, using original file:`, error);
     }
   }
 
@@ -74,6 +156,7 @@ export const processFile = async (
       size: processedFile.size,
       type: processedFile.type,
       lastModified: processedFile.lastModified,
+      fileCategory,
     },
     base64,
     blob: processedFile,
@@ -119,8 +202,14 @@ export const loadFromSession = async (key: string): Promise<ProcessedImage[]> =>
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         
+        // Determine file category from stored file type
+        const fileCategory = getFileCategoryFromType(item.file.type, item.file.name);
+        
         return {
-          file: item.file,
+          file: {
+            ...item.file,
+            fileCategory,
+          },
           base64: item.base64,
           blob,
           url,
@@ -131,6 +220,18 @@ export const loadFromSession = async (key: string): Promise<ProcessedImage[]> =>
     console.warn('Failed to load from session storage:', error);
     return [];
   }
+};
+
+// Helper to determine file category from MIME type or filename
+const getFileCategoryFromType = (type: string, name: string): 'image' | 'pdf' | 'excel' | 'word' | 'other' => {
+  const lowerType = type.toLowerCase();
+  const lowerName = name.toLowerCase();
+
+  if (lowerType.startsWith('image/')) return 'image';
+  if (lowerType === 'application/pdf' || lowerName.endsWith('.pdf')) return 'pdf';
+  if (lowerType.includes('spreadsheet') || lowerName.endsWith('.xls') || lowerName.endsWith('.xlsx')) return 'excel';
+  if (lowerType.includes('wordprocessingml') || lowerName.endsWith('.doc') || lowerName.endsWith('.docx')) return 'word';
+  return 'other';
 };
 
 export const clearSession = (key: string): void => {

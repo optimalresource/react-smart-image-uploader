@@ -115,6 +115,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             size: croppedFile.size,
             type: croppedFile.type,
             lastModified: croppedFile.lastModified,
+            fileCategory: 'image',
           },
           base64,
           blob: croppedBlob,

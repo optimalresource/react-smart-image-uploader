@@ -1,6 +1,7 @@
 const resolve = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
 const typescript = require('@rollup/plugin-typescript');
+const json = require('@rollup/plugin-json');
 const peerDepsExternal = require('rollup-plugin-peer-deps-external');
 const postcss = require('rollup-plugin-postcss');
 const { dts } = require('rollup-plugin-dts');
@@ -25,6 +26,7 @@ module.exports = {
   ],
   plugins: [
     peerDepsExternal(),
+    json(),
     resolve({
       browser: true,
     }),
